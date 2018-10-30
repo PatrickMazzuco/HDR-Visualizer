@@ -83,3 +83,44 @@
 	<string.h>
 	<ctype.h>
 
+1540922086 source:/home/pmazzuco/Documents/repos/HDR-Visualizer/opengl.c
+	"opengl.h"
+
+1475872167 /home/pmazzuco/Documents/repos/HDR-Visualizer/opengl.h
+	<windows.h>
+	"gl/glut.h"
+	<GLUT/glut.h>
+	<GL/glut.h>
+	<stdio.h>
+	<stdlib.h>
+
+1300995668 /home/pmazzuco/Documents/repos/HDR-Visualizer/include/GL/glut.h
+	"freeglut.h"
+
+1300995668 /home/pmazzuco/Documents/repos/HDR-Visualizer/include/GL/freeglut.h
+	"freeglut_std.h"
+	"freeglut_ext.h"
+
+1300995668 /home/pmazzuco/Documents/repos/HDR-Visualizer/include/GL/freeglut_std.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1300995668 /home/pmazzuco/Documents/repos/HDR-Visualizer/include/GL/freeglut_ext.h
+
+1475628294 source:/home/pmazzuco/Documents/repos/HDR-Visualizer/rgbe.c
+	"rgbe.h"
+	<math.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1472593460 /home/pmazzuco/Documents/repos/HDR-Visualizer/rgbe.h
+	<stdio.h>
+
+1540923887 source:/home/pmazzuco/Documents/repos/HDR-Visualizer/main.c
+	<math.h>
+	<string.h>
+	"opengl.h"
+	"rgbe.h"
+

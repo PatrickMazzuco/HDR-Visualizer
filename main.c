@@ -33,22 +33,49 @@ float fastpow(float a, float b) {
       return u.f;
 }
 
+//Converter para 25 Bits
+float to24Bit(float in) {
+return fmin(1.0, in) * 255;
+}
+
 // Função principal de processamento: ela deve chamar outras funções
 // quando for necessário (ex: algoritmos de tone mapping, etc)
 void process()
 {
+    if (exposure > 1.0) exposure = 1.0;
     printf("Exposure: %.3f\n", exposure);
-    //
-    // EXEMPLO: preenche a imagem com pixels cor de laranja...
-    //
-    //
-    // SUBSTITUA este código pelos algoritmos a serem implementados
-    //
-    int pos;
-    for(pos=0; pos<sizeX*sizeY; pos++) {
-        image8[pos].r = (unsigned char) (255 * exposure);
-        image8[pos].g = (unsigned char) (127 * exposure);
-        image8[pos].b = (unsigned char) (0 * exposure);
+
+    float tempR, tempG, tempB;
+
+    //Scale
+    if (modo == 0) {
+        float c = 0.3;
+        for (int i = 0; i < sizeX*sizeY; i++) {
+            tempR = image[i].r/(image[i].r + c);
+            tempG = image[i].g/(image[i].g + c);
+            tempB = image[i].b/(image[i].b + c);
+
+            //Adicionar ao array de saida.
+            image8[i].r = (unsigned char) to24Bit(tempR) * exposure;
+            image8[i].g = (unsigned char) to24Bit(tempG) * exposure;
+            image8[i].b = (unsigned char) to24Bit(tempB) * exposure;
+
+        }
+    } else {
+        //Gamma
+        if (modo == 1) {
+            float gammaCorrection = 2.2;
+            for (int i = 0; i < sizeX*sizeY; i++) {
+                tempR = fastpow(image[i].r, 1/gammaCorrection);
+                tempG = fastpow(image[i].g, 1/gammaCorrection);
+                tempB = fastpow(image[i].b, 1/gammaCorrection);
+
+                //Adicionar ao array de saida.
+                image8[i].r = (unsigned char) to24Bit(tempR) * exposure;
+                image8[i].g = (unsigned char) to24Bit(tempG) * exposure;
+                image8[i].b = (unsigned char) to24Bit(tempB) * exposure;
+            }
+        }
     }
 
     //
@@ -57,6 +84,7 @@ void process()
     buildTex();
 }
 
+//Recebe o nome do arquivo como argumento.
 int main(int argc, char** argv)
 {
     if(argc==1) {
@@ -67,34 +95,31 @@ int main(int argc, char** argv)
     // Inicialização da janela gráfica
     init(argc,argv);
 
-    //
-    // INCLUA aqui o código para LER a imagem de entrada
-    //
-    // Siga as orientações no enunciado para:
-    //
-    // 1. Descobrir o tamanho da imagem (ler header)
-    // 2. Ler os pixels
-    //
+    //Ler imagem de entrada:
 
-    // TESTE: cria uma imagem de 800x600
-    sizeX = 800;
-    sizeY = 600;
+    FILE* arq = fopen(argv[1],"rb");
 
-    printf("%d x %d\n", sizeX, sizeY);
+    //Se o arquivo foi encontrado:
+    if (arq != NULL) {
+        RGBE_ReadHeader(arq, &sizeX, &sizeY, NULL);
+        image = (RGBf*) malloc(sizeof(RGBf) * sizeX * sizeY);
+        int result = RGBE_ReadPixels_RLE(arq, (float*)image, sizeX, sizeY);
+        fclose(arq);
 
-    // Aloca imagem float
-    image = (RGBf *)malloc(sizeof(RGBf) * sizeX * sizeY);
+        printf("%d x %d\n", sizeX, sizeY);
 
-    // Aloca memória para imagem de 24 bits
-    image8 = (RGB8*) malloc(sizeof(RGB8) * sizeX * sizeY);
+        exposure = 1.0f; //Exposicao inicial
 
-    exposure = 1.0f; // exposição inicial
+        //Array de saida
+        image8 = (RGB8*) malloc(sizeof(RGB8) * sizeX * sizeY);
 
-    // Aplica processamento inicial
-    process();
+        process();
+        glutMainLoop();
+    } else {
+        printf("File %s not found.", argv[1]);
+        exit(2);
+    }
 
-    // Não retorna... a partir daqui, interação via teclado e mouse apenas, na janela gráfica
-    glutMainLoop();
     return 0;
 }
 
